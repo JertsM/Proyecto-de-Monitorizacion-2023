@@ -113,7 +113,7 @@ scrape_configs:
 
   - job_name: 'node_exporter'
     static_configs:
-      - targets: ['node_exporter:']
+      - targets: ['node_exporter:9100']
 ```
 
 ## Acceso y configuración de Grafana

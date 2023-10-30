@@ -51,7 +51,7 @@ sudo apt install docker-compose
 
 Para empezar, crearemos el archivo 'docker-compose.yml', en el directorio que nosotros queramos (en mi caso en la carpeta raíz de mi usuario de Ubuntu). En él escribiremos las imágenes que tiene que descargar, los puertos que empleará y demás parámetros que añadiremos según nos convengan.
 
-Para este proyecto trabajaré con 'Prometheus', 'Grafana' y 'Cadvisor':
+Para este proyecto trabajaré con 'Prometheus', 'Grafana', 'node_exporter' y 'Cadvisor':
 
 ### Archivo docker-compose.yml
 ```bash
@@ -74,6 +74,19 @@ services:
     depends_on:
       - prometheus
 
+  node_exporter:
+    image: prom/node-exporter
+    volumes:
+      - /proc:/host/proc:io
+      - /sys:/host/sys:ro
+      - /:/rootfs:ro
+    command:
+      - '--path.procfs=/host/proc'
+      - '--path.sysfs=/host/sys'
+      - '--path.rootfs=/rootfs'
+    ports:
+      - "9100:9100"
+
   cadvisor:
     image: google/cadvisor
     ports:
@@ -87,7 +100,7 @@ services:
 
 ### Archivo prometheus.yml
 
-A continuación, debemos crear un archivo de configuración de Prometheus al que llamaremos 'prometheus.yml', en el que declararemos que capture las métricas de 'Cadvisor':
+A continuación, debemos crear un archivo de configuración de Prometheus al que llamaremos 'prometheus.yml', en el que declararemos que capture las métricas de 'Cadvisor' y 'node_exporter':
 
 ```bash
 global:
@@ -97,6 +110,10 @@ scrape_configs:
   - job_name: 'cadvisor'
     static_configs:
       - targets: ['cadvisor:8080']
+
+  - job_name: 'node_exporter'
+    static_configs:
+      - targets: ['node_exporter:']
 ```
 
 ## Acceso y configuración de Grafana

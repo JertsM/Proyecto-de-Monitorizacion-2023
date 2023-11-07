@@ -34,3 +34,12 @@ services:
       - "8080:80"
     volumes:
       - ./nginx.conf:/etc/nginx/nginx.conf
+
+  poste:
+    image: analogic/poste.io
+    restart: always
+    network_mode: "host"
+    volumes:
+      - /root/mail-data/:/data
+    environment:
+      - HTTPS=ON
